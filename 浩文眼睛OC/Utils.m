@@ -68,6 +68,7 @@ UIImage *image;
         NSLog(@"%@", result);
         [array addObject:result];
     }];
+    int a = 0;
     
     return [array objectAtIndex:0];
     //return result;
