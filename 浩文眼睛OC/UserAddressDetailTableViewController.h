@@ -19,7 +19,7 @@
     NSArray *district;
 }
 @property (assign, nonatomic) int userNo;
-@property (assign, nonatomic) int tmpAddressNo;
+@property (assign, nonatomic) int AddressIndex;
 @property (assign, nonatomic) NSString *type;
 @property (strong, nonatomic) IBOutlet UITextField *name;
 @property (strong, nonatomic) IBOutlet UITextField *phone;

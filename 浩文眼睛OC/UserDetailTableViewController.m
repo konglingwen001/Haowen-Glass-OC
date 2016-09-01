@@ -31,17 +31,10 @@
 
 -(void)viewWillAppear:(BOOL)animated {
 
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    if (user.userImage == nil) {
-        self.userImage.image = nil;
-    } else {
-        self.userImage.image = (UIImage *)[Utils GetPhotoWithURL:user.userImage];
-    }
-    
-    self.lblNickName.text = user.nickname;
-    self.lblEmail.text = user.email;
-    self.lblPhoneNum.text = user.phone;
+    self.userImage.image = [Utils GetImage];
+    self.lblNickName.text = [Utils GetUserInfo:@"nickname"];
+    self.lblEmail.text = [Utils GetUserInfo:@"email"];
+    self.lblPhoneNum.text = [Utils GetUserInfo:@"phone"];
 }
 - (IBAction)logout:(id)sender {
     [self showOkayCancelAlert];

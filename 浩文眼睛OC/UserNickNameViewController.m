@@ -8,20 +8,14 @@
 
 #import "UserNickNameViewController.h"
 #import "Utils.h"
-#import "User.h"
 
 @implementation UserNickNameViewController
 
 -(void)viewDidLoad {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    self.nickname.text = user.nickname;
+    self.nickname.text = [Utils GetUserInfo:@"nickname"];
 }
 - (IBAction)save:(id)sender {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    user.nickname = self.nickname.text;
-    [Utils SaveUserInfo:user AtIndex:self.userNo];
+    [Utils SetUserInfo:self.nickname.text forInfoType:@"nickname"];
     [self.navigationController popViewControllerAnimated:YES];
 }
 @end

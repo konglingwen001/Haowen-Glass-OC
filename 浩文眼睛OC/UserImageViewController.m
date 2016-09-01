@@ -7,19 +7,15 @@
 //
 
 #import "UserImageViewController.h"
+#import "ASIHTTPRequest.h"
+#import "ASIFormDataRequest.h"
 #import "Utils.h"
 #import "User.h"
 
 @implementation UserImageViewController
 
 -(void)viewWillAppear:(BOOL)animated {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    if (user.userImage == nil) {
-        self.userImage.image = nil;
-    } else {
-        self.userImage.image = [Utils GetPhotoWithURL:user.userImage];
-    }
+    self.userImage.image = [Utils GetImage];
 }
 - (IBAction)imageSelect:(id)sender {
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc]init];
@@ -29,15 +25,21 @@
 }
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
-    NSURL *url = [info valueForKey:UIImagePickerControllerReferenceURL];
-    NSString *str = [url absoluteString];
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    user.userImage = str;
-    [Utils SaveUserInfo:user AtIndex:self.userNo];
+    // 获取相册中的图片数据
+    UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
+    NSData *data = UIImagePNGRepresentation(image);
     
+    // 将获取的图片数据存入沙盒，临时保存
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *path = [paths objectAtIndex:0];
+    NSString *newPath = [path stringByAppendingPathComponent:@"test.jpg"];
+    [data writeToFile:newPath atomically:YES];
+    
+    // 将沙盒中的图片通过路径保存到数据库
+    [Utils SaveImage:newPath];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
 - (IBAction)takePicture:(id)sender {
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc]init];
     

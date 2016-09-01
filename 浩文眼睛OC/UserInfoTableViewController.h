@@ -10,6 +10,5 @@
 
 @interface UserInfoTableViewController : UITableViewController
 
-@property (nonatomic, assign) int userNo;
 
 @end

@@ -10,12 +10,13 @@
 #import "User.h"
 
 @interface Utils : NSObject
-
-+ (id) GetPhotoWithURL:(NSString *) url;
-+ (id) GetPhotoWithPhotoLibrary:(NSString *) url;
-+ (id) GetUserInfo;
-+ (void) SaveUserInfo:(User *) user AtIndex:(int) userNo;
-+(void) AddUsers;
-+(void) ClearUsers;
++ (Boolean) isLogedIn;
++ (int) GetAddressCount;
++ (NSDictionary *) GetAddress:(int) index;
++ (void) SaveAddress:(NSDictionary *) addressDic;
++ (void) SaveImage:(NSString *) imageUrl;
++ (id) GetImage;
++ (id) GetUserInfo:(NSString *) userInfoType;
++ (void) SetUserInfo:(NSString *) nickname forInfoType:(NSString *) userInfoType;
 
 @end

@@ -13,15 +13,10 @@
 @implementation UserPhoneViewController
 
 -(void)viewDidLoad {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    self.phone.text = user.phone;
+    self.phone.text = [Utils GetUserInfo:@"phone"];
 }
 - (IBAction)save:(id)sender {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    user.phone = self.phone.text;
-    [Utils SaveUserInfo:user AtIndex:self.userNo];
+    [Utils SetUserInfo:self.phone.text forInfoType:@"phone"];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

@@ -23,29 +23,17 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    NSMutableSet *addresses = [user.addresses mutableCopy];
-    return [addresses count];
+    // 获取地址个数
+    int count = [Utils GetAddressCount];
+    return count;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UserAddressTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"addressCell"];
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    NSMutableSet *addresses = [user.addresses mutableCopy];
-    NSArray *components = [addresses allObjects];
-    NSArray *sortedArray = [components sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        if ([obj1 addressNo] < [obj2 addressNo]) {
-            return (NSComparisonResult)NSOrderedAscending;
-        } else if([obj1 addressNo] > [obj2 addressNo]) {
-            return (NSComparisonResult)NSOrderedDescending;
-        } else {
-            return (NSComparisonResult)NSOrderedSame;
-        }
-    }];
-    Address *address = [sortedArray objectAtIndex:indexPath.row];
-    cell.address.text = [[[address.province stringByAppendingString:address.city] stringByAppendingString:address.district] stringByAppendingString:address.detail];
+    NSDictionary *addressDic = [Utils GetAddress:(short)indexPath.row];
+    NSString *address = [[[addressDic valueForKey:@"province"] stringByAppendingString:[addressDic valueForKey:@"city"]] stringByAppendingString:[addressDic valueForKey:@"district"]];
+    NSString *detail = [addressDic valueForKey:@"detail"];
+    cell.address.text = [address stringByAppendingString:detail];
     return cell;
 }
 
@@ -54,31 +42,31 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSMutableArray *dataArray = [Utils GetUserInfo];
-        User *user = [dataArray objectAtIndex:self.userNo];
-        NSMutableSet *addresses = [user.addresses mutableCopy];
-        
-        NSArray *components = [addresses allObjects];
-        
-        NSArray *sortedArray = [components sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-            if ([obj1 addressNo] < [obj2 addressNo]) {
-                return (NSComparisonResult)NSOrderedAscending;
-            } else if([obj1 addressNo] > [obj2 addressNo]) {
-                return (NSComparisonResult)NSOrderedDescending;
-            } else {
-                return (NSComparisonResult)NSOrderedSame;
-            }
-        }];
-        for (int i = 0; i < [sortedArray count]; i++) {
-            if (i  == indexPath.row) {
-                [user removeAddressesObject:[sortedArray objectAtIndex:i]];
-                break;
-            }
-        }
-        [Utils SaveUserInfo:user AtIndex:self.userNo];
-        [tableView reloadData];
-    }
+//    if (editingStyle == UITableViewCellEditingStyleDelete) {
+//        NSMutableArray *dataArray = [Utils GetUserInfo];
+//        User *user = [dataArray objectAtIndex:self.userNo];
+//        NSMutableSet *addresses = [user.addresses mutableCopy];
+//        
+//        NSArray *components = [addresses allObjects];
+//        
+//        NSArray *sortedArray = [components sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+//            if ([obj1 addressNo] < [obj2 addressNo]) {
+//                return (NSComparisonResult)NSOrderedAscending;
+//            } else if([obj1 addressNo] > [obj2 addressNo]) {
+//                return (NSComparisonResult)NSOrderedDescending;
+//            } else {
+//                return (NSComparisonResult)NSOrderedSame;
+//            }
+//        }];
+//        for (int i = 0; i < [sortedArray count]; i++) {
+//            if (i  == indexPath.row) {
+//                [user removeAddressesObject:[sortedArray objectAtIndex:i]];
+//                break;
+//            }
+//        }
+//        [Utils SaveUserInfo:user AtIndex:self.userNo];
+//        [tableView reloadData];
+//    }
 }
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -87,7 +75,7 @@
         
         [segue.destinationViewController setValue:@"editAddress" forKey:@"type"];
         
-        [segue.destinationViewController setValue:[NSNumber numberWithInteger:self.tableView.indexPathForSelectedRow.row] forKey:@"tmpAddressNo"];
+        [segue.destinationViewController setValue:[NSNumber numberWithInteger:self.tableView.indexPathForSelectedRow.row] forKey:@"AddressIndex"];
     } else {
         [segue.destinationViewController setValue:@"addAddress" forKey:@"type"];
     }

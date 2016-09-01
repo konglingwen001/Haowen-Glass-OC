@@ -6,6 +6,7 @@
 //  Copyright © 2016年 孔令文. All rights reserved.
 //
 
+#import "ASIHTTPRequest.h"
 #import "LoginViewController.h"
 #import "UserTableViewCell.h"
 #import "AppDelegate.h"
@@ -24,19 +25,17 @@
 
 @implementation LoginViewController
 - (IBAction)login:(UIButton *)sender {
-    int count = 0;
-    for (User *user in self.dataArray) {
-        if ([self.username.text isEqualToString:user.username] && [self.password.text isEqualToString:user.password]) {
-            NSLog(@"登录成功");
-            break;
-        }
-        count++;
-    }
-    if (count >= self.dataArray.count) {
+    NSString *urlStr = [NSString stringWithFormat:@"http://localhost:8080/Test/HelloServlet?username=%@&password=%@", self.username.text, self.password.text];
+    NSURL *url = [NSURL URLWithString:urlStr];
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+    [request startSynchronous];
+    NSString *str = [request responseString];
+    if ([str isEqualToString:@"Failed"]) {
         NSLog(@"登录失败");
+    } else {
+        NSLog(@"登录成功");
     }
-    NSDictionary *dic = [[NSDictionary alloc]initWithObjectsAndKeys:[NSNumber numberWithInteger:count], @"index", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"do" object:self userInfo:dic];
+    
     [self.navigationController popViewControllerAnimated:YES];
     
 }
@@ -49,8 +48,6 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-    self.dataArray = [Utils GetUserInfo];
-    [self.table reloadData];
 }
 
 - (void)didReceiveMemoryWarning {

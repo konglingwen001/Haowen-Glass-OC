@@ -13,15 +13,10 @@
 @implementation UserEmailViewController
 
 -(void)viewDidLoad {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    self.email.text = user.email;
+    self.email.text = [Utils GetUserInfo:@"email"];
 }
 - (IBAction)save:(id)sender {
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    User *user = [dataArray objectAtIndex:self.userNo];
-    user.email = self.email.text;
-    [Utils SaveUserInfo:user AtIndex:self.userNo];
+    [Utils SetUserInfo:self.email.text forInfoType:@"email"];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

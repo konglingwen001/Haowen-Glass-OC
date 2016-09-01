@@ -6,6 +6,8 @@
 //  Copyright © 2016年 孔令文. All rights reserved.
 //
 
+#import "ASIHTTPRequest.h"
+#import "ASIFormDataRequest.h"
 #import "RegisterViewController.h"
 #import "AppDelegate.h"
 #import "User.h"
@@ -24,48 +26,24 @@
 
 @implementation RegisterViewController
 - (IBAction)submit:(id)sender {
-    self.appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    NSManagedObjectContext *context = self.appDelegate.managedObjectContext;
     
-    NSMutableArray *dataArray = [Utils GetUserInfo];
-    
-    User *user = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:context];
-    user.username = self.username.text;
-    user.password = self.password.text;
-    user.nickname = self.nickname.text;
-    user.email = self.email.text;
-    user.phone = self.phone.text;
-    
-    
-    int flag = 0;
-    for (User *tmpUser in dataArray) {
-        if ([tmpUser.username isEqualToString:user.username]) {
-            flag = 1;
-            break;
-        }
-    }
-    
-    if (flag == 0) {
-        NSError *error;
-        if ([context save:&error]) {
-            NSLog(@"保存成功");
-        } else {
-            NSLog(@"%@, %@", error, [error userInfo]);
-        }
-        [self.navigationController popViewControllerAnimated:YES];
-    } else {
-        [self showOkayCancelAlert];
-    }
-    
-    
-    
+    NSString *urlStr = [NSString stringWithFormat:@"http://localhost:8080/Test/Register"];
+    NSURL *url = [NSURL URLWithString:urlStr];
+    ASIFormDataRequest *request = [[ASIFormDataRequest alloc] initWithURL:url];
+    [request setPostValue:self.username.text forKey:@"username"];
+    [request setPostValue:self.password.text forKey:@"password"];
+    [request setPostValue:self.phone.text forKey:@"phone"];
+    [request setPostValue:self.email.text forKey:@"email"];
+    [request setPostValue:self.nickname.text forKey:@"nickname"];
+    [request setRequestMethod:@"POST"];
+    [request startSynchronous];   
 }
 - (IBAction)clear:(UIButton *)sender {
 
-    [Utils ClearUsers];
+    //[Utils ClearUsers];
 }
 - (IBAction)AddUsers:(id)sender {
-    [Utils AddUsers];
+    //[Utils AddUsers];
 }
 
 - (void)viewDidLoad {
