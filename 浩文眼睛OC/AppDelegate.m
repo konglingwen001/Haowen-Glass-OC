@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "GuideViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,6 +18,14 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"everLaunched"]) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"everLaunched"];
+        UIViewController *guideView = [[GuideViewController alloc] init];
+        self.window.rootViewController = guideView;
+    } else {
+        //self.window.rootViewController =
+    }
     
 //    self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
 //    self.window.backgroundColor = [UIColor whiteColor];

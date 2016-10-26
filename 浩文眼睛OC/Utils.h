@@ -10,10 +10,14 @@
 #import "User.h"
 
 @interface Utils : NSObject
-+ (Boolean) isLogedIn;
-+ (int) GetAddressCount;
++ (int) Registe:(NSDictionary *) userDic;
++ (void) isLogedIn;
++ (void) Login:(NSString *) username withPwd:(NSString *) password;
++ (void) Logout;
++ (void) GetAddressCount;
 + (NSDictionary *) GetAddress:(int) index;
 + (void) SaveAddress:(NSDictionary *) addressDic;
++ (void) DeleteAddress:(int) index;
 + (void) SaveImage:(NSString *) imageUrl;
 + (id) GetImage;
 + (id) GetUserInfo:(NSString *) userInfoType;

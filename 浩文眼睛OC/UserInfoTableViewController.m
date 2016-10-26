@@ -14,21 +14,39 @@
 
 @implementation UserInfoTableViewController
 
+bool isLoginedIn;
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(isLoginedIn:) name:@"isLoginedIn" object:nil];
     
 }
 
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void)isLoginedIn:(NSNotification *)noti {
+    NSString *result = [noti.userInfo valueForKey:@"isLoginedIn"];
+    if ([result isEqualToString:@"Success"]) {
+        isLoginedIn = YES;
+    } else {
+        isLoginedIn = NO;
+    }
+    [self.tableView reloadData];
+}
+
 -(void)viewWillAppear:(BOOL)animated {
+    [Utils isLogedIn];
     [self.tableView reloadData];
     
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UserInfoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellId"];
-    if ([Utils isLogedIn] != YES) {
+    if (isLoginedIn != YES) {
         [cell.username setHidden:YES];
         [cell.btnLogin setHidden:NO];
         [cell setAccessoryType:UITableViewCellAccessoryNone];

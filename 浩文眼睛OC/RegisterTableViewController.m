@@ -1,26 +1,28 @@
 //
-//  UserDetailTableViewController.m
+//  RegisterTableViewController.m
 //  浩文眼睛OC
 //
-//  Created by 孔令文 on 16/6/12.
+//  Created by 孔令文 on 16/9/3.
 //  Copyright © 2016年 孔令文. All rights reserved.
 //
 
-#import "UserDetailTableViewController.h"
-#import "AppDelegate.h"
-#import "User.h"
+#import "RegisterTableViewController.h"
 #import "Utils.h"
 
-@interface UserDetailTableViewController ()
-
+@interface RegisterTableViewController ()
 
 @end
 
-@implementation UserDetailTableViewController
+#define SUCCESS 0
+#define USERNAME_EXISTED -1
+#define PHONE_EXISTED -2
+#define EMAIL_EXISTED -3
+#define DATABASE_ERROR -10
+
+@implementation RegisterTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -28,23 +30,55 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
-
--(void)viewWillAppear:(BOOL)animated {
-
-    self.userImage.image = [Utils GetImage];
-    self.lblNickName.text = [Utils GetUserInfo:@"nickname"];
-    self.lblEmail.text = [Utils GetUserInfo:@"email"];
-    self.lblPhoneNum.text = [Utils GetUserInfo:@"phone"];
+- (IBAction)submit:(id)sender {
+    
+    NSDictionary *userDic = [NSDictionary dictionaryWithObjectsAndKeys:self.tfUsername.text, @"username",
+                             self.tfPassword.text, @"password",
+                             self.tfPhone.text, @"phone",
+                             self.tfEmail.text, @"email",
+                             self.tfNickname.text, @"nickname", nil];
+    
+    int result = [Utils Registe:userDic];
+    
+    if (result != SUCCESS) {
+        [self showOkayCancelAlert:result];
+    } else if (result == PHONE_EXISTED) {
+        
+    } else if (result == EMAIL_EXISTED) {
+        
+    } else if (result == DATABASE_ERROR) {
+        
+    }
 }
-- (IBAction)logout:(id)sender {
-    [self showOkayCancelAlert];
+- (IBAction)clear:(id)sender {
+    self.tfUsername.text = @"";
+    self.tfPassword.text = @"";
+    self.tfPhone.text = @"";
+    self.tfEmail.text = @"";
+    self.tfNickname.text = @"";
 }
 
-- (void)showOkayCancelAlert {
-    NSString *title = NSLocalizedString(@"退出登录", nil);
-    NSString *message = NSLocalizedString(@"是否退出登录？", nil);
-    NSString *cancelButtonTitle = NSLocalizedString(@"否", nil);
-    NSString *otherButtonTitle = NSLocalizedString(@"是", nil);
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)showOkayCancelAlert:(int) errorNo {
+    
+    NSString *title = NSLocalizedString(@"登录错误", nil);
+    NSString *message = @"";
+    NSString *cancelButtonTitle = NSLocalizedString(@"Cancel", nil);
+    NSString *otherButtonTitle = NSLocalizedString(@"OK", nil);
+    
+    if (errorNo == USERNAME_EXISTED) {
+        message = NSLocalizedString(@"用户名已存在", nil);
+    } else if (errorNo == PHONE_EXISTED) {
+        message = NSLocalizedString(@"电话已被使用", nil);
+    } else if (errorNo == EMAIL_EXISTED) {
+        message = NSLocalizedString(@"邮箱已被使用", nil);
+    } else if (errorNo == DATABASE_ERROR) {
+        message = NSLocalizedString(@"系统错误", nil);
+    }
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     
@@ -54,8 +88,11 @@
     }];
     
     UIAlertAction *otherAction = [UIAlertAction actionWithTitle:otherButtonTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [Utils Logout];
-        [self.navigationController popViewControllerAnimated:YES];
+//        self.tfUsername.text = @"";
+//        self.tfPassword.text = @"";
+//        self.tfNickname.text = @"";
+//        self.tfEmail.text = @"";
+//        self.tfPhone.text = @"";
     }];
     
     // Add the actions.
@@ -65,34 +102,9 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - Table view data source
-
-//-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    
-//}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
-}
-
--(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    //if ([segue.identifier isEqualToString:@"editUserImage"]) {
-        [segue.destinationViewController setValue:[NSNumber numberWithInt:self.userNo] forKey:@"userNo"];
-    //}
-}
-
 /*
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
     
     // Configure the cell...
     

@@ -14,7 +14,26 @@
 
 @implementation UserAddressTableViewController
 
+int addressCount = 0;
+
+-(void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(getAddressCount:) name:@"AddressCount" object:nil];
+}
+
+-(void) getAddressCount:(NSNotification *)noti {
+    NSString *count = noti.userInfo[@"addressCount"];
+    addressCount = [count intValue];
+    [self.tableView reloadData];
+}
+
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 -(void)viewWillAppear:(BOOL)animated {
+    [Utils GetAddressCount];
     [self.tableView reloadData];
 }
 
@@ -24,8 +43,7 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // 获取地址个数
-    int count = [Utils GetAddressCount];
-    return count;
+    return addressCount;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -42,31 +60,12 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-//    if (editingStyle == UITableViewCellEditingStyleDelete) {
-//        NSMutableArray *dataArray = [Utils GetUserInfo];
-//        User *user = [dataArray objectAtIndex:self.userNo];
-//        NSMutableSet *addresses = [user.addresses mutableCopy];
-//        
-//        NSArray *components = [addresses allObjects];
-//        
-//        NSArray *sortedArray = [components sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-//            if ([obj1 addressNo] < [obj2 addressNo]) {
-//                return (NSComparisonResult)NSOrderedAscending;
-//            } else if([obj1 addressNo] > [obj2 addressNo]) {
-//                return (NSComparisonResult)NSOrderedDescending;
-//            } else {
-//                return (NSComparisonResult)NSOrderedSame;
-//            }
-//        }];
-//        for (int i = 0; i < [sortedArray count]; i++) {
-//            if (i  == indexPath.row) {
-//                [user removeAddressesObject:[sortedArray objectAtIndex:i]];
-//                break;
-//            }
-//        }
-//        [Utils SaveUserInfo:user AtIndex:self.userNo];
-//        [tableView reloadData];
-//    }
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        
+        // 删除选中地址
+        [Utils DeleteAddress:(short)indexPath.row];
+        [tableView reloadData];
+    }
 }
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

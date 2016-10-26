@@ -1,68 +1,64 @@
 //
-//  UserDetailTableViewController.m
+//  LoginTableViewController.m
 //  浩文眼睛OC
 //
-//  Created by 孔令文 on 16/6/12.
+//  Created by 孔令文 on 16/9/17.
 //  Copyright © 2016年 孔令文. All rights reserved.
 //
 
-#import "UserDetailTableViewController.h"
-#import "AppDelegate.h"
-#import "User.h"
+#import "LoginTableViewController.h"
 #import "Utils.h"
+#import "MBProgressHUD.h"
 
-@interface UserDetailTableViewController ()
-
+@interface LoginTableViewController ()
 
 @end
 
-@implementation UserDetailTableViewController
+@implementation LoginTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didLogin:) name:@"loginResult" object:nil];
 }
 
--(void)viewWillAppear:(BOOL)animated {
-
-    self.userImage.image = [Utils GetImage];
-    self.lblNickName.text = [Utils GetUserInfo:@"nickname"];
-    self.lblEmail.text = [Utils GetUserInfo:@"email"];
-    self.lblPhoneNum.text = [Utils GetUserInfo:@"phone"];
-}
-- (IBAction)logout:(id)sender {
-    [self showOkayCancelAlert];
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)showOkayCancelAlert {
-    NSString *title = NSLocalizedString(@"退出登录", nil);
-    NSString *message = NSLocalizedString(@"是否退出登录？", nil);
-    NSString *cancelButtonTitle = NSLocalizedString(@"否", nil);
-    NSString *otherButtonTitle = NSLocalizedString(@"是", nil);
-    
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    
-    // Create the actions.
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:cancelButtonTitle style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        
-    }];
-    
-    UIAlertAction *otherAction = [UIAlertAction actionWithTitle:otherButtonTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [Utils Logout];
+- (void) didLogin:(NSNotification *) noti {
+    NSString *result = noti.userInfo[@"loginResult"];
+    if ([result isEqualToString:@"Success"]) {
         [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [self showAllTextDialog:@"账号或密码错误"];
+    }
+}
+
+// 登录失败时Toast显示失败信息
+-(void)showAllTextDialog:(NSString *)str
+{
+    __block MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
+    [self.view addSubview:HUD];
+    HUD.label.text = str;
+    HUD.mode = MBProgressHUDModeText;
+    
+    //指定距离中心点的X轴和Y轴的位置，不指定则在屏幕中间显示
+    //    HUD.yOffset = 100.0f;
+    //    HUD.xOffset = 100.0f;
+    
+    [HUD showAnimated:YES whileExecutingBlock:^{
+        sleep(1);
+    } completionBlock:^{
+        [HUD removeFromSuperview];
+        //        [HUD release];
+        HUD = nil;
     }];
     
-    // Add the actions.
-    [alertController addAction:cancelAction];
-    [alertController addAction:otherAction];
-    
-    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (IBAction)login:(id)sender {
+    [Utils Login:self.username.text withPwd:self.password.text];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -72,27 +68,19 @@
 
 #pragma mark - Table view data source
 
-//-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    
-//}
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+#warning Incomplete implementation, return the number of sections
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 5;
-}
-
--(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    //if ([segue.identifier isEqualToString:@"editUserImage"]) {
-        [segue.destinationViewController setValue:[NSNumber numberWithInt:self.userNo] forKey:@"userNo"];
-    //}
+#warning Incomplete implementation, return the number of rows
+    return 3;
 }
 
 /*
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
     
     // Configure the cell...
     
